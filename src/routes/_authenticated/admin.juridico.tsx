@@ -124,7 +124,7 @@ function JuridicoList() {
                   <AfiliadoPicker
                     tenantId={tenant?.id}
                     value={form.afiliado_id}
-                    onChange={(v) => setForm({ ...form, afiliado_id: v })}
+                    onChange={(v: string) => setForm({ ...form, afiliado_id: v })}
                     placeholder="(opcional) selecionar afiliado…"
                   />
                 </F>
