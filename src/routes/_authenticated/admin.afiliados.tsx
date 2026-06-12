@@ -1,8 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import {
-  Search, Copy, ExternalLink, UserPlus, Upload, Download, FileText,
+  Search, Copy, ExternalLink, UserPlus, Download, FileText,
   MoreHorizontal, Eye, CheckCircle2, XCircle, Pause, Check, Loader2,
 } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
