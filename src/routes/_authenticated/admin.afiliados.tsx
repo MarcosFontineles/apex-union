@@ -3,17 +3,21 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import {
   Search, Copy, ExternalLink, UserPlus, Upload, Download, FileText,
-  MoreHorizontal, Eye, CheckCircle2, XCircle, Pause, Check,
+  MoreHorizontal, Eye, CheckCircle2, XCircle, Pause, Check, Loader2,
 } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
 import { StatusBadge } from "./admin.index";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter,
+} from "@/components/ui/sheet";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
   DropdownMenuSeparator, DropdownMenuLabel,
