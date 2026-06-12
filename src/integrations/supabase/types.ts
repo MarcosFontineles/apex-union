@@ -192,6 +192,72 @@ export type Database = {
           },
         ]
       }
+      documentos: {
+        Row: {
+          afiliado_id: string | null
+          categoria: Database["public"]["Enums"]["documento_categoria"]
+          created_at: string
+          created_by: string | null
+          descricao: string | null
+          id: string
+          mime_type: string | null
+          size_bytes: number | null
+          storage_bucket: string
+          storage_path: string
+          tenant_id: string
+          titulo: string
+          updated_at: string
+          visibilidade: Database["public"]["Enums"]["documento_visibilidade"]
+        }
+        Insert: {
+          afiliado_id?: string | null
+          categoria?: Database["public"]["Enums"]["documento_categoria"]
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          id?: string
+          mime_type?: string | null
+          size_bytes?: number | null
+          storage_bucket?: string
+          storage_path: string
+          tenant_id: string
+          titulo: string
+          updated_at?: string
+          visibilidade?: Database["public"]["Enums"]["documento_visibilidade"]
+        }
+        Update: {
+          afiliado_id?: string | null
+          categoria?: Database["public"]["Enums"]["documento_categoria"]
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          id?: string
+          mime_type?: string | null
+          size_bytes?: number | null
+          storage_bucket?: string
+          storage_path?: string
+          tenant_id?: string
+          titulo?: string
+          updated_at?: string
+          visibilidade?: Database["public"]["Enums"]["documento_visibilidade"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentos_afiliado_id_fkey"
+            columns: ["afiliado_id"]
+            isOneToOne: false
+            referencedRelation: "afiliados"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documentos_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mensalidades: {
         Row: {
           afiliado_id: string
@@ -245,6 +311,129 @@ export type Database = {
           },
           {
             foreignKeyName: "mensalidades_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      processo_andamentos: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          data_andamento: string
+          descricao: string
+          id: string
+          processo_id: string
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          data_andamento?: string
+          descricao: string
+          id?: string
+          processo_id: string
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          data_andamento?: string
+          descricao?: string
+          id?: string
+          processo_id?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "processo_andamentos_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: false
+            referencedRelation: "processos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "processo_andamentos_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      processos: {
+        Row: {
+          advogado_responsavel: string | null
+          afiliado_id: string | null
+          comarca: string | null
+          created_at: string
+          created_by: string | null
+          data_distribuicao: string | null
+          descricao: string | null
+          id: string
+          numero_processo: string
+          proxima_audiencia: string | null
+          status: Database["public"]["Enums"]["processo_status"]
+          tenant_id: string
+          tipo: Database["public"]["Enums"]["processo_tipo"]
+          titulo: string
+          uf: string | null
+          updated_at: string
+          valor_causa: number | null
+          vara: string | null
+        }
+        Insert: {
+          advogado_responsavel?: string | null
+          afiliado_id?: string | null
+          comarca?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_distribuicao?: string | null
+          descricao?: string | null
+          id?: string
+          numero_processo: string
+          proxima_audiencia?: string | null
+          status?: Database["public"]["Enums"]["processo_status"]
+          tenant_id: string
+          tipo?: Database["public"]["Enums"]["processo_tipo"]
+          titulo: string
+          uf?: string | null
+          updated_at?: string
+          valor_causa?: number | null
+          vara?: string | null
+        }
+        Update: {
+          advogado_responsavel?: string | null
+          afiliado_id?: string | null
+          comarca?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_distribuicao?: string | null
+          descricao?: string | null
+          id?: string
+          numero_processo?: string
+          proxima_audiencia?: string | null
+          status?: Database["public"]["Enums"]["processo_status"]
+          tenant_id?: string
+          tipo?: Database["public"]["Enums"]["processo_tipo"]
+          titulo?: string
+          uf?: string | null
+          updated_at?: string
+          valor_causa?: number | null
+          vara?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "processos_afiliado_id_fkey"
+            columns: ["afiliado_id"]
+            isOneToOne: false
+            referencedRelation: "afiliados"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "processos_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -399,6 +588,16 @@ export type Database = {
         Args: { _tenant_id: string; _user_id: string }
         Returns: boolean
       }
+      update_tenant_branding: {
+        Args: {
+          _accent_color: string
+          _logo_url: string
+          _name: string
+          _primary_color: string
+          _tenant_id: string
+        }
+        Returns: undefined
+      }
       verify_carteirinha: {
         Args: { _afiliado_id: string }
         Returns: {
@@ -417,12 +616,33 @@ export type Database = {
     Enums: {
       afiliado_status: "pendente" | "ativo" | "inativo" | "suspenso"
       app_role: "super_admin" | "admin" | "staff" | "afiliado"
+      documento_categoria:
+        | "estatuto"
+        | "ata"
+        | "convencao"
+        | "comunicado"
+        | "contrato"
+        | "outro"
+      documento_visibilidade: "publico" | "afiliados" | "staff"
       mensalidade_status:
         | "pendente"
         | "pago"
         | "atrasado"
         | "isento"
         | "cancelado"
+      processo_status:
+        | "aberto"
+        | "em_andamento"
+        | "suspenso"
+        | "encerrado"
+        | "arquivado"
+      processo_tipo:
+        | "trabalhista"
+        | "civel"
+        | "previdenciario"
+        | "tributario"
+        | "administrativo"
+        | "outro"
       tenant_status: "ativo" | "suspenso" | "cancelado"
     }
     CompositeTypes: {
@@ -553,12 +773,36 @@ export const Constants = {
     Enums: {
       afiliado_status: ["pendente", "ativo", "inativo", "suspenso"],
       app_role: ["super_admin", "admin", "staff", "afiliado"],
+      documento_categoria: [
+        "estatuto",
+        "ata",
+        "convencao",
+        "comunicado",
+        "contrato",
+        "outro",
+      ],
+      documento_visibilidade: ["publico", "afiliados", "staff"],
       mensalidade_status: [
         "pendente",
         "pago",
         "atrasado",
         "isento",
         "cancelado",
+      ],
+      processo_status: [
+        "aberto",
+        "em_andamento",
+        "suspenso",
+        "encerrado",
+        "arquivado",
+      ],
+      processo_tipo: [
+        "trabalhista",
+        "civel",
+        "previdenciario",
+        "tributario",
+        "administrativo",
+        "outro",
       ],
       tenant_status: ["ativo", "suspenso", "cancelado"],
     },
