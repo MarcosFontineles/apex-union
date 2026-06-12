@@ -16,9 +16,6 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter,
-} from "@/components/ui/sheet";
-import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
   DropdownMenuSeparator, DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
@@ -355,18 +352,18 @@ function AfiliadosList() {
         </DialogContent>
       </Dialog>
 
-      {/* Sheet de novo cadastro */}
-      <Sheet open={createOpen} onOpenChange={setCreateOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle>Novo afiliado</SheetTitle>
-            <SheetDescription>
+      {/* Dialog de novo cadastro */}
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Novo afiliado</DialogTitle>
+            <DialogDescription>
               Cadastro feito pela administração. A matrícula é gerada automaticamente.
-            </SheetDescription>
-          </SheetHeader>
+            </DialogDescription>
+          </DialogHeader>
 
           <form
-            className="mt-6 space-y-5"
+            className="mt-4 space-y-5"
             onSubmit={(e) => { e.preventDefault(); createAfiliado.mutate(); }}
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -420,7 +417,7 @@ function AfiliadosList() {
               </div>
             </div>
 
-            <SheetFooter className="gap-2 sm:gap-2">
+            <DialogFooter className="gap-2 sm:gap-2">
               <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>
                 Cancelar
               </Button>
@@ -428,10 +425,10 @@ function AfiliadosList() {
                 {createAfiliado.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Cadastrar afiliado
               </Button>
-            </SheetFooter>
+            </DialogFooter>
           </form>
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
     </AdminShell>
   );
 }
