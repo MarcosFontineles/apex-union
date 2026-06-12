@@ -204,11 +204,9 @@ function AfiliadosList() {
         {/* Toolbar de ações */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
-            <a href={signupUrl || "#"} target="_blank" rel="noreferrer">
-              <Button>
-                <UserPlus className="mr-2 h-4 w-4" /> Novo cadastro
-              </Button>
-            </a>
+            <Button onClick={() => setCreateOpen(true)} disabled={!tenant}>
+              <UserPlus className="mr-2 h-4 w-4" /> Novo cadastro
+            </Button>
             <Button variant="outline" onClick={copyLink} disabled={!tenant}>
               <Copy className="mr-2 h-4 w-4" /> Copiar link de auto-cadastro
             </Button>
