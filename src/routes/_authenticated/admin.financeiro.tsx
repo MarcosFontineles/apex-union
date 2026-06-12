@@ -235,7 +235,6 @@ function NovaCobrancaDialog({ tenantId }: { tenantId?: string }) {
   const defaultComp = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
 
   const [afiliadoId, setAfiliadoId] = useState<string>("");
-  const [pickerOpen, setPickerOpen] = useState(false);
   const [valor, setValor] = useState("50.00");
   const [parcelas, setParcelas] = useState("1");
   const [comp, setComp] = useState(defaultComp);
@@ -243,25 +242,6 @@ function NovaCobrancaDialog({ tenantId }: { tenantId?: string }) {
   const [method, setMethod] = useState<string>("pix");
   const [descricao, setDescricao] = useState("");
 
-  const { data: afiliados } = useQuery({
-    queryKey: ["afiliados-pick", tenantId],
-    enabled: !!tenantId && open,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("afiliados")
-        .select("id, matricula, full_name")
-        .eq("tenant_id", tenantId!)
-        .order("full_name", { ascending: true })
-        .limit(1000);
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
-
-  const selected = useMemo(
-    () => afiliados?.find((a) => a.id === afiliadoId),
-    [afiliados, afiliadoId],
-  );
 
   const reset = () => {
     setAfiliadoId(""); setValor("50.00"); setParcelas("1");
