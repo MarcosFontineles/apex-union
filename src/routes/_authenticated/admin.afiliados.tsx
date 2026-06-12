@@ -1,8 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import {
-  Search, Copy, ExternalLink, UserPlus, Upload, Download, FileText,
+  Search, Copy, ExternalLink, UserPlus, Download, FileText,
   MoreHorizontal, Eye, CheckCircle2, XCircle, Pause, Check, Loader2,
 } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
@@ -34,6 +34,7 @@ type StatusFilter = "todos" | "ativo" | "pendente" | "inativo" | "suspenso";
 
 function AfiliadosList() {
   const { tenant } = useTenant();
+  const navigate = useNavigate();
   const qc = useQueryClient();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<StatusFilter>("todos");
@@ -207,9 +208,6 @@ function AfiliadosList() {
             <Button variant="outline" onClick={copyLink} disabled={!tenant}>
               <Copy className="mr-2 h-4 w-4" /> Copiar link de auto-cadastro
             </Button>
-            <Link to="/admin/importar">
-              <Button variant="outline"><Upload className="mr-2 h-4 w-4" /> Importar CSV</Button>
-            </Link>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={exportCSV}>
@@ -290,10 +288,8 @@ function AfiliadosList() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                          <DropdownMenuItem asChild>
-                            <Link to="/admin/afiliados/$id" params={{ id: a.id }}>
-                              <Eye className="mr-2 h-4 w-4" /> Abrir cadastro
-                            </Link>
+                          <DropdownMenuItem onSelect={() => navigate({ to: "/admin/afiliados/$id", params: { id: a.id } })}>
+                            <Eye className="mr-2 h-4 w-4" /> Abrir cadastro
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           {a.status !== "ativo" && (

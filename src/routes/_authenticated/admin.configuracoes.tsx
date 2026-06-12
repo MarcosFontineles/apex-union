@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Upload, Loader2, Link as LinkIcon } from "lucide-react";
+import { Upload, Loader2, Link as LinkIcon, FileSpreadsheet, ArrowRight } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -157,6 +157,26 @@ function Configuracoes() {
                 navigator.clipboard.writeText(cadastroUrl);
                 toast.success("Link copiado");
               }}>Copiar</Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-card">
+          <CardHeader><CardTitle>Importação em lote</CardTitle></CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            <div className="flex items-start gap-3 rounded-md border bg-muted/30 p-3">
+              <FileSpreadsheet className="mt-0.5 h-5 w-5 text-muted-foreground shrink-0" />
+              <div className="flex-1">
+                <p className="font-medium text-foreground">Importar afiliados por CSV</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Carregue planilhas com mapeamento de colunas e pré-visualização antes de importar.
+                </p>
+              </div>
+              <Link to="/admin/importar">
+                <Button size="sm" variant="outline">
+                  Abrir <ArrowRight className="ml-2 h-3.5 w-3.5" />
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>
