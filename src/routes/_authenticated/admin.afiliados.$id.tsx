@@ -1,12 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ChevronLeft, CheckCircle2, XCircle, QrCode } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ChevronLeft, CheckCircle2, XCircle, QrCode, Camera } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
 import { StatusBadge } from "./admin.index";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { formatCPF, formatDate, formatPhone } from "@/lib/format";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { formatCPF, formatDate, formatPhone, initials } from "@/lib/format";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/afiliados/$id")({
@@ -98,6 +100,8 @@ function AfiliadoDetail() {
           </div>
 
           <div className="space-y-6">
+            <PhotoCard afiliadoId={a.id} tenantId={a.tenant_id} fullName={a.full_name} photoUrl={a.photo_url} />
+
             <Card className="shadow-card">
               <CardHeader><CardTitle className="text-base">Ações</CardTitle></CardHeader>
               <CardContent className="space-y-2">
@@ -136,5 +140,63 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
       <dt className="text-xs uppercase tracking-wide text-muted-foreground">{label}</dt>
       <dd className="mt-1 font-medium">{value}</dd>
     </div>
+  );
+}
+
+function PhotoCard({ afiliadoId, tenantId, fullName, photoUrl }: {
+  afiliadoId: string; tenantId: string; fullName: string; photoUrl: string | null;
+}) {
+  const qc = useQueryClient();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [signed, setSigned] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!photoUrl) { setSigned(null); return; }
+      const { data } = await supabase.storage.from("afiliado-fotos").createSignedUrl(photoUrl, 3600);
+      if (!cancelled) setSigned(data?.signedUrl ?? null);
+    })();
+    return () => { cancelled = true; };
+  }, [photoUrl]);
+
+  const onPick = async (file: File) => {
+    if (!file.type.startsWith("image/")) { toast.error("Selecione uma imagem"); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error("Máx 5 MB"); return; }
+    setUploading(true);
+    const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
+    const path = `${tenantId}/${afiliadoId}/photo-${Date.now()}.${ext}`;
+    const up = await supabase.storage.from("afiliado-fotos").upload(path, file, { upsert: true, contentType: file.type });
+    if (up.error) { setUploading(false); toast.error(up.error.message); return; }
+    const { error } = await supabase.from("afiliados").update({ photo_url: path }).eq("id", afiliadoId);
+    setUploading(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Foto atualizada");
+    qc.invalidateQueries({ queryKey: ["afiliado", afiliadoId] });
+  };
+
+  return (
+    <Card className="shadow-card">
+      <CardHeader><CardTitle className="text-base">Foto</CardTitle></CardHeader>
+      <CardContent className="flex flex-col items-center gap-3">
+        <Avatar className="h-32 w-32 ring-2 ring-border">
+          {signed && <AvatarImage src={signed} alt={fullName} />}
+          <AvatarFallback className="text-3xl">{initials(fullName)}</AvatarFallback>
+        </Avatar>
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => e.target.files?.[0] && onPick(e.target.files[0])}
+        />
+        <Button variant="outline" size="sm" disabled={uploading} onClick={() => inputRef.current?.click()}>
+          <Camera className="mr-2 h-4 w-4" />
+          {uploading ? "Enviando…" : photoUrl ? "Trocar foto" : "Enviar foto"}
+        </Button>
+        <p className="text-xs text-muted-foreground text-center">PNG/JPG até 5MB.<br/>Aparece na carteirinha digital.</p>
+      </CardContent>
+    </Card>
   );
 }

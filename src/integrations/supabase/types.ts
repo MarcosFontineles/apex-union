@@ -192,6 +192,66 @@ export type Database = {
           },
         ]
       }
+      mensalidades: {
+        Row: {
+          afiliado_id: string
+          competencia: string
+          created_at: string
+          due_date: string
+          id: string
+          notes: string | null
+          paid_at: string | null
+          payment_method: string | null
+          status: Database["public"]["Enums"]["mensalidade_status"]
+          tenant_id: string
+          updated_at: string
+          valor: number
+        }
+        Insert: {
+          afiliado_id: string
+          competencia: string
+          created_at?: string
+          due_date: string
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          status?: Database["public"]["Enums"]["mensalidade_status"]
+          tenant_id: string
+          updated_at?: string
+          valor: number
+        }
+        Update: {
+          afiliado_id?: string
+          competencia?: string
+          created_at?: string
+          due_date?: string
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          status?: Database["public"]["Enums"]["mensalidade_status"]
+          tenant_id?: string
+          updated_at?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mensalidades_afiliado_id_fkey"
+            columns: ["afiliado_id"]
+            isOneToOne: false
+            referencedRelation: "afiliados"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mensalidades_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -306,7 +366,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_super_admin: { Args: never; Returns: Json }
+      create_tenant_as_super_admin: {
+        Args: {
+          _accent_color?: string
+          _admin_user_id?: string
+          _name: string
+          _primary_color?: string
+          _slug: string
+        }
+        Returns: string
+      }
       current_tenant_id: { Args: never; Returns: string }
+      generate_mensalidades_lote: {
+        Args: {
+          _competencia: string
+          _due_day?: number
+          _tenant_id: string
+          _valor: number
+        }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -337,6 +417,12 @@ export type Database = {
     Enums: {
       afiliado_status: "pendente" | "ativo" | "inativo" | "suspenso"
       app_role: "super_admin" | "admin" | "staff" | "afiliado"
+      mensalidade_status:
+        | "pendente"
+        | "pago"
+        | "atrasado"
+        | "isento"
+        | "cancelado"
       tenant_status: "ativo" | "suspenso" | "cancelado"
     }
     CompositeTypes: {
@@ -467,6 +553,13 @@ export const Constants = {
     Enums: {
       afiliado_status: ["pendente", "ativo", "inativo", "suspenso"],
       app_role: ["super_admin", "admin", "staff", "afiliado"],
+      mensalidade_status: [
+        "pendente",
+        "pago",
+        "atrasado",
+        "isento",
+        "cancelado",
+      ],
       tenant_status: ["ativo", "suspenso", "cancelado"],
     },
   },
