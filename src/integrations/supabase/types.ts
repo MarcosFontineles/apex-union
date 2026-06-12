@@ -14,16 +14,330 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      afiliados: {
+        Row: {
+          address_city: string | null
+          address_number: string | null
+          address_state: string | null
+          address_street: string | null
+          address_zip: string | null
+          birth_date: string | null
+          consent_lgpd: boolean
+          consent_lgpd_at: string | null
+          cpf: string
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          joined_at: string | null
+          matricula: string
+          phone: string | null
+          photo_url: string | null
+          profession: string | null
+          rg: string | null
+          signature_url: string | null
+          status: Database["public"]["Enums"]["afiliado_status"]
+          tenant_id: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          address_city?: string | null
+          address_number?: string | null
+          address_state?: string | null
+          address_street?: string | null
+          address_zip?: string | null
+          birth_date?: string | null
+          consent_lgpd?: boolean
+          consent_lgpd_at?: string | null
+          cpf: string
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          joined_at?: string | null
+          matricula: string
+          phone?: string | null
+          photo_url?: string | null
+          profession?: string | null
+          rg?: string | null
+          signature_url?: string | null
+          status?: Database["public"]["Enums"]["afiliado_status"]
+          tenant_id: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          address_city?: string | null
+          address_number?: string | null
+          address_state?: string | null
+          address_street?: string | null
+          address_zip?: string | null
+          birth_date?: string | null
+          consent_lgpd?: boolean
+          consent_lgpd_at?: string | null
+          cpf?: string
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          joined_at?: string | null
+          matricula?: string
+          phone?: string | null
+          photo_url?: string | null
+          profession?: string | null
+          rg?: string | null
+          signature_url?: string | null
+          status?: Database["public"]["Enums"]["afiliado_status"]
+          tenant_id?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "afiliados_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          entity: string
+          entity_id: string | null
+          id: string
+          metadata: Json | null
+          tenant_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          entity: string
+          entity_id?: string | null
+          id?: string
+          metadata?: Json | null
+          tenant_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          entity?: string
+          entity_id?: string | null
+          id?: string
+          metadata?: Json | null
+          tenant_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_logs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dependentes: {
+        Row: {
+          afiliado_id: string
+          birth_date: string | null
+          cpf: string | null
+          created_at: string
+          full_name: string
+          id: string
+          relation: string | null
+          tenant_id: string
+        }
+        Insert: {
+          afiliado_id: string
+          birth_date?: string | null
+          cpf?: string | null
+          created_at?: string
+          full_name: string
+          id?: string
+          relation?: string | null
+          tenant_id: string
+        }
+        Update: {
+          afiliado_id?: string
+          birth_date?: string | null
+          cpf?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          relation?: string | null
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dependentes_afiliado_id_fkey"
+            columns: ["afiliado_id"]
+            isOneToOne: false
+            referencedRelation: "afiliados"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dependentes_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          tenant_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenants: {
+        Row: {
+          accent_color: string
+          cnpj: string | null
+          created_at: string
+          id: string
+          logo_url: string | null
+          name: string
+          primary_color: string
+          slug: string
+          status: Database["public"]["Enums"]["tenant_status"]
+          updated_at: string
+        }
+        Insert: {
+          accent_color?: string
+          cnpj?: string | null
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name: string
+          primary_color?: string
+          slug: string
+          status?: Database["public"]["Enums"]["tenant_status"]
+          updated_at?: string
+        }
+        Update: {
+          accent_color?: string
+          cnpj?: string | null
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name?: string
+          primary_color?: string
+          slug?: string
+          status?: Database["public"]["Enums"]["tenant_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          tenant_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          tenant_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          tenant_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      current_tenant_id: { Args: never; Returns: string }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_tenant_admin: {
+        Args: { _tenant_id: string; _user_id: string }
+        Returns: boolean
+      }
+      verify_carteirinha: {
+        Args: { _afiliado_id: string }
+        Returns: {
+          full_name: string
+          id: string
+          joined_at: string
+          matricula: string
+          photo_url: string
+          status: Database["public"]["Enums"]["afiliado_status"]
+          tenant_logo: string
+          tenant_name: string
+          tenant_primary_color: string
+        }[]
+      }
     }
     Enums: {
-      [_ in never]: never
+      afiliado_status: "pendente" | "ativo" | "inativo" | "suspenso"
+      app_role: "super_admin" | "admin" | "staff" | "afiliado"
+      tenant_status: "ativo" | "suspenso" | "cancelado"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +464,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      afiliado_status: ["pendente", "ativo", "inativo", "suspenso"],
+      app_role: ["super_admin", "admin", "staff", "afiliado"],
+      tenant_status: ["ativo", "suspenso", "cancelado"],
+    },
   },
 } as const
