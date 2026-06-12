@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { Building2, LayoutDashboard, Users, Settings, LogOut, FileText, Wallet, Gavel, Upload } from "lucide-react";
+import { Building2, LayoutDashboard, Users, Settings, LogOut, FileText, Wallet, Gavel, Upload, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -7,7 +7,7 @@ import { initials } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 
-type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean };
+type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean; superOnly?: boolean };
 const NAV: NavItem[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/afiliados", label: "Afiliados", icon: Users },
@@ -16,10 +16,11 @@ const NAV: NavItem[] = [
   { to: "/admin/juridico", label: "Jurídico", icon: Gavel, exact: false },
   { to: "/admin/documentos", label: "Documentos", icon: FileText, exact: false },
   { to: "/admin/configuracoes", label: "Configurações", icon: Settings, exact: false },
+  { to: "/admin/tenants", label: "Sindicatos", icon: Shield, exact: false, superOnly: true },
 ];
 
 export function AdminShell({ children, title }: { children: React.ReactNode; title?: string }) {
-  const { profile } = useAuth();
+  const { profile, isSuperAdmin } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -41,7 +42,7 @@ export function AdminShell({ children, title }: { children: React.ReactNode; tit
           <span className="font-semibold tracking-tight">UnionSaaS</span>
         </div>
         <nav className="flex-1 space-y-0.5 p-3">
-          {NAV.map((item) => {
+          {NAV.filter((i) => !i.superOnly || isSuperAdmin).map((item) => {
             const active = item.exact
               ? location.pathname === item.to
               : location.pathname.startsWith(item.to);
