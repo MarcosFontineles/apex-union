@@ -102,7 +102,9 @@ function PublicSignup() {
 
     setSubmitting(true);
     try {
-      const matricula = `M${Date.now().toString().slice(-7)}`;
+      const { data: mat, error: mErr } = await supabase.rpc("next_matricula", { _tenant_id: tenant.id });
+      if (mErr) throw mErr;
+      const matricula = mat as string;
       const signaturePng = sigRef.current!.toDataURL("image/png");
 
       const { data: created, error } = await supabase.from("afiliados").insert({
