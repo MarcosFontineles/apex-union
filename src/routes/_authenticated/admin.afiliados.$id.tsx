@@ -1,12 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ChevronLeft, CheckCircle2, XCircle, QrCode } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ChevronLeft, CheckCircle2, XCircle, QrCode, Camera } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
 import { StatusBadge } from "./admin.index";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { formatCPF, formatDate, formatPhone } from "@/lib/format";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { formatCPF, formatDate, formatPhone, initials } from "@/lib/format";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/afiliados/$id")({
