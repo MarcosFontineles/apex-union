@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VerificarIdRouteImport } from './routes/verificar.$id'
+import { Route as CadastroSlugRouteImport } from './routes/cadastro.$slug'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -39,6 +41,16 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerificarIdRoute = VerificarIdRouteImport.update({
+  id: '/verificar/$id',
+  path: '/verificar/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CadastroSlugRoute = CadastroSlugRouteImport.update({
+  id: '/cadastro/$slug',
+  path: '/cadastro/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
@@ -128,6 +140,8 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/app': typeof AuthenticatedAppRoute
   '/portal': typeof AuthenticatedPortalRouteWithChildren
+  '/cadastro/$slug': typeof CadastroSlugRoute
+  '/verificar/$id': typeof VerificarIdRoute
   '/admin/afiliados': typeof AuthenticatedAdminAfiliadosRouteWithChildren
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/admin/documentos': typeof AuthenticatedAdminDocumentosRoute
@@ -144,6 +158,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/app': typeof AuthenticatedAppRoute
+  '/cadastro/$slug': typeof CadastroSlugRoute
+  '/verificar/$id': typeof VerificarIdRoute
   '/admin/afiliados': typeof AuthenticatedAdminAfiliadosRouteWithChildren
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/admin/documentos': typeof AuthenticatedAdminDocumentosRoute
@@ -164,6 +180,8 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/portal': typeof AuthenticatedPortalRouteWithChildren
+  '/cadastro/$slug': typeof CadastroSlugRoute
+  '/verificar/$id': typeof VerificarIdRoute
   '/_authenticated/admin/afiliados': typeof AuthenticatedAdminAfiliadosRouteWithChildren
   '/_authenticated/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/_authenticated/admin/documentos': typeof AuthenticatedAdminDocumentosRoute
@@ -184,6 +202,8 @@ export interface FileRouteTypes {
     | '/admin'
     | '/app'
     | '/portal'
+    | '/cadastro/$slug'
+    | '/verificar/$id'
     | '/admin/afiliados'
     | '/admin/configuracoes'
     | '/admin/documentos'
@@ -200,6 +220,8 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/app'
+    | '/cadastro/$slug'
+    | '/verificar/$id'
     | '/admin/afiliados'
     | '/admin/configuracoes'
     | '/admin/documentos'
@@ -219,6 +241,8 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/app'
     | '/_authenticated/portal'
+    | '/cadastro/$slug'
+    | '/verificar/$id'
     | '/_authenticated/admin/afiliados'
     | '/_authenticated/admin/configuracoes'
     | '/_authenticated/admin/documentos'
@@ -236,6 +260,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  CadastroSlugRoute: typeof CadastroSlugRoute
+  VerificarIdRoute: typeof VerificarIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -259,6 +285,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verificar/$id': {
+      id: '/verificar/$id'
+      path: '/verificar/$id'
+      fullPath: '/verificar/$id'
+      preLoaderRoute: typeof VerificarIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cadastro/$slug': {
+      id: '/cadastro/$slug'
+      path: '/cadastro/$slug'
+      fullPath: '/cadastro/$slug'
+      preLoaderRoute: typeof CadastroSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/portal': {
@@ -434,6 +474,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  CadastroSlugRoute: CadastroSlugRoute,
+  VerificarIdRoute: VerificarIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
