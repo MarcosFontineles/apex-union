@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { Building2, LayoutDashboard, Users, Settings, LogOut, FileText, Wallet, Gavel, Shield } from "lucide-react";
+import { Building2, LayoutDashboard, Users, Settings, LogOut, FileText, Wallet, Gavel, Shield, BookOpen } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -12,6 +12,7 @@ const NAV: NavItem[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/afiliados", label: "Afiliados", icon: Users },
   { to: "/admin/financeiro", label: "Financeiro", icon: Wallet, exact: false },
+  { to: "/admin/caixa", label: "Livro Caixa", icon: BookOpen, exact: false },
   { to: "/admin/juridico", label: "Jurídico", icon: Gavel, exact: false },
   { to: "/admin/documentos", label: "Documentos", icon: FileText, exact: false },
   { to: "/admin/configuracoes", label: "Configurações", icon: Settings, exact: false },

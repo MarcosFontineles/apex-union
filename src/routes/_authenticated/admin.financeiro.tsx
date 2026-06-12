@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Wallet, CheckCircle2, Plus, AlertCircle, FileText, Loader2 } from "lucide-react";
+import { Wallet, CheckCircle2, Plus, AlertCircle, FileText, Loader2, ArrowDownCircle } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -175,22 +175,47 @@ function Kpi({ label, value, icon: Icon, accent }: { label: string; value: strin
 
 function MarcarPagoDialog({ id, suggested }: { id: string; suggested: string }) {
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [method, setMethod] = useState(suggested);
 
   const run = useMutation({
     mutationFn: async () => {
+      const { data: m, error: mErr } = await supabase
+        .from("mensalidades")
+        .select("id, tenant_id, afiliado_id, valor, competencia")
+        .eq("id", id)
+        .maybeSingle();
+      if (mErr) throw mErr;
+      if (!m) throw new Error("Mensalidade não encontrada");
+      const today = new Date().toISOString();
       const { error } = await supabase
         .from("mensalidades")
-        .update({ status: "pago", paid_at: new Date().toISOString(), payment_method: method })
+        .update({ status: "pago", paid_at: today, payment_method: method })
         .eq("id", id);
       if (error) throw error;
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error: cErr } = await supabase.from("caixa_movimentos").insert({
+        tenant_id: m.tenant_id,
+        kind: "entrada",
+        valor: m.valor,
+        payment_method: method,
+        description: `Mensalidade ${String(m.competencia).slice(0, 7)}`,
+        mensalidade_id: m.id,
+        afiliado_id: m.afiliado_id,
+        occurred_at: today.slice(0, 10),
+        created_by: user?.id ?? null,
+      });
+      if (cErr) throw cErr;
     },
     onSuccess: () => {
-      toast.success("Mensalidade quitada");
+      toast.success("Recebimento registrado no livro caixa");
       qc.invalidateQueries({ queryKey: ["mensalidades"] });
       qc.invalidateQueries({ queryKey: ["mensalidades-kpis"] });
+      qc.invalidateQueries({ queryKey: ["caixa"] });
+      qc.invalidateQueries({ queryKey: ["caixa-saldo-anterior"] });
       setOpen(false);
+      navigate({ to: "/admin/caixa" });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Erro"),
   });
@@ -198,12 +223,14 @@ function MarcarPagoDialog({ id, suggested }: { id: string; suggested: string }) 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline">Marcar pago</Button>
+        <Button size="sm">
+          <ArrowDownCircle className="mr-1.5 h-3.5 w-3.5" /> Receber
+        </Button>
       </DialogTrigger>
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>Confirmar pagamento</DialogTitle>
-          <DialogDescription>Selecione o método utilizado.</DialogDescription>
+          <DialogTitle>Confirmar recebimento</DialogTitle>
+          <DialogDescription>O valor será registrado como entrada no livro caixa.</DialogDescription>
         </DialogHeader>
         <div className="py-2">
           <Label className="text-xs">Método de pagamento</Label>
@@ -220,7 +247,7 @@ function MarcarPagoDialog({ id, suggested }: { id: string; suggested: string }) 
           <Button variant="ghost" onClick={() => setOpen(false)}>Cancelar</Button>
           <Button onClick={() => run.mutate()} disabled={run.isPending}>
             {run.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Confirmar
+            Receber e ir ao caixa
           </Button>
         </DialogFooter>
       </DialogContent>

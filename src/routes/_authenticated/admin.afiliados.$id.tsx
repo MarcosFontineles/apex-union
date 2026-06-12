@@ -1,19 +1,35 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, CheckCircle2, XCircle, QrCode, Camera } from "lucide-react";
+import { ChevronLeft, CheckCircle2, XCircle, QrCode, Camera, Pencil, Trash2, Loader2 } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
 import { StatusBadge } from "./admin.index";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { formatCPF, formatDate, formatPhone, initials } from "@/lib/format";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/afiliados/$id")({
   component: AfiliadoDetail,
 });
+
+type AfiliadoForm = {
+  full_name: string; cpf: string; rg: string; birth_date: string;
+  phone: string; email: string; profession: string;
+  address_street: string; address_number: string; address_city: string;
+  address_state: string; address_zip: string;
+};
 
 function AfiliadoDetail() {
   const { id } = Route.useParams();
@@ -45,15 +61,57 @@ function AfiliadoDetail() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Erro"),
   });
 
+  const removeAfiliado = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("afiliados").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Afiliado excluído");
+      qc.invalidateQueries({ queryKey: ["afiliados"] });
+      qc.invalidateQueries({ queryKey: ["admin-stats"] });
+      navigate({ to: "/admin/afiliados" });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Erro ao excluir"),
+  });
+
   if (isLoading) return <AdminShell title="…"><p className="text-muted-foreground">Carregando…</p></AdminShell>;
   if (!a) return <AdminShell title="Não encontrado"><p>Afiliado não encontrado.</p></AdminShell>;
 
   return (
     <AdminShell title={a.full_name}>
       <div className="space-y-6">
-        <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/admin/afiliados" })}>
-          <ChevronLeft className="mr-1 h-4 w-4" /> Voltar
-        </Button>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/admin/afiliados" })}>
+            <ChevronLeft className="mr-1 h-4 w-4" /> Voltar
+          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <EditarAfiliadoDialog afiliado={a} />
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" className="text-destructive hover:text-destructive">
+                  <Trash2 className="mr-2 h-4 w-4" /> Excluir
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Excluir afiliado?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esta ação remove o cadastro de <strong>{a.full_name}</strong> permanentemente.
+                    Mensalidades e movimentações vinculadas perdem a referência. Não pode ser desfeita.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => removeAfiliado.mutate()}>
+                    {removeAfiliado.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Excluir definitivamente
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-6">
@@ -140,6 +198,149 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
       <dt className="text-xs uppercase tracking-wide text-muted-foreground">{label}</dt>
       <dd className="mt-1 font-medium">{value}</dd>
     </div>
+  );
+}
+
+function EditarAfiliadoDialog({ afiliado }: { afiliado: Record<string, unknown> & { id: string } }) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const a = afiliado as Record<string, string | null>;
+  const [form, setForm] = useState<AfiliadoForm>({
+    full_name: (a.full_name as string) ?? "",
+    cpf: (a.cpf as string) ?? "",
+    rg: a.rg ?? "",
+    birth_date: a.birth_date ?? "",
+    phone: a.phone ?? "",
+    email: a.email ?? "",
+    profession: a.profession ?? "",
+    address_street: a.address_street ?? "",
+    address_number: a.address_number ?? "",
+    address_city: a.address_city ?? "",
+    address_state: a.address_state ?? "",
+    address_zip: a.address_zip ?? "",
+  });
+
+  useEffect(() => {
+    if (open) {
+      setForm({
+        full_name: (a.full_name as string) ?? "",
+        cpf: (a.cpf as string) ?? "",
+        rg: a.rg ?? "",
+        birth_date: a.birth_date ?? "",
+        phone: a.phone ?? "",
+        email: a.email ?? "",
+        profession: a.profession ?? "",
+        address_street: a.address_street ?? "",
+        address_number: a.address_number ?? "",
+        address_city: a.address_city ?? "",
+        address_state: a.address_state ?? "",
+        address_zip: a.address_zip ?? "",
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  const setF = <K extends keyof AfiliadoForm>(k: K, v: string) => setForm((s) => ({ ...s, [k]: v }));
+
+  const save = useMutation({
+    mutationFn: async () => {
+      if (!form.full_name.trim() || !form.cpf.trim()) throw new Error("Nome e CPF são obrigatórios");
+      const { error } = await supabase.from("afiliados").update({
+        full_name: form.full_name.trim(),
+        cpf: form.cpf.replace(/\D/g, ""),
+        rg: form.rg || null,
+        birth_date: form.birth_date || null,
+        phone: form.phone.replace(/\D/g, "") || null,
+        email: form.email || null,
+        profession: form.profession || null,
+        address_street: form.address_street || null,
+        address_number: form.address_number || null,
+        address_city: form.address_city || null,
+        address_state: form.address_state || null,
+        address_zip: form.address_zip || null,
+      }).eq("id", afiliado.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Cadastro atualizado");
+      qc.invalidateQueries({ queryKey: ["afiliado", afiliado.id] });
+      qc.invalidateQueries({ queryKey: ["afiliados"] });
+      setOpen(false);
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Erro"),
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <Button onClick={() => setOpen(true)}>
+        <Pencil className="mr-2 h-4 w-4" /> Editar
+      </Button>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Editar afiliado</DialogTitle>
+          <DialogDescription>Atualize os dados cadastrais.</DialogDescription>
+        </DialogHeader>
+        <form className="mt-4 space-y-5" onSubmit={(e) => { e.preventDefault(); save.mutate(); }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label className="text-xs">Nome completo*</Label>
+              <Input required value={form.full_name} onChange={(e) => setF("full_name", e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">CPF*</Label>
+              <Input required maxLength={14} value={formatCPF(form.cpf)} onChange={(e) => setF("cpf", e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">RG</Label>
+              <Input value={form.rg} onChange={(e) => setF("rg", e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Data de nascimento</Label>
+              <Input type="date" value={form.birth_date} onChange={(e) => setF("birth_date", e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Profissão</Label>
+              <Input value={form.profession} onChange={(e) => setF("profession", e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Telefone</Label>
+              <Input value={formatPhone(form.phone)} onChange={(e) => setF("phone", e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">E-mail</Label>
+              <Input type="email" value={form.email} onChange={(e) => setF("email", e.target.value)} />
+            </div>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label className="text-xs">Logradouro</Label>
+              <Input value={form.address_street} onChange={(e) => setF("address_street", e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Número</Label>
+              <Input value={form.address_number} onChange={(e) => setF("address_number", e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">CEP</Label>
+              <Input value={form.address_zip} onChange={(e) => setF("address_zip", e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Cidade</Label>
+              <Input value={form.address_city} onChange={(e) => setF("address_city", e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">UF</Label>
+              <Input maxLength={2} value={form.address_state} onChange={(e) => setF("address_state", e.target.value.toUpperCase())} />
+            </div>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
+            <Button type="submit" disabled={save.isPending}>
+              {save.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Salvar alterações
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
 

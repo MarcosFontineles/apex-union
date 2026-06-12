@@ -144,6 +144,73 @@ export type Database = {
           },
         ]
       }
+      caixa_movimentos: {
+        Row: {
+          afiliado_id: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          kind: Database["public"]["Enums"]["caixa_kind"]
+          mensalidade_id: string | null
+          occurred_at: string
+          payment_method: string | null
+          tenant_id: string
+          updated_at: string
+          valor: number
+        }
+        Insert: {
+          afiliado_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          kind: Database["public"]["Enums"]["caixa_kind"]
+          mensalidade_id?: string | null
+          occurred_at?: string
+          payment_method?: string | null
+          tenant_id: string
+          updated_at?: string
+          valor: number
+        }
+        Update: {
+          afiliado_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["caixa_kind"]
+          mensalidade_id?: string | null
+          occurred_at?: string
+          payment_method?: string | null
+          tenant_id?: string
+          updated_at?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "caixa_movimentos_afiliado_id_fkey"
+            columns: ["afiliado_id"]
+            isOneToOne: false
+            referencedRelation: "afiliados"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "caixa_movimentos_mensalidade_id_fkey"
+            columns: ["mensalidade_id"]
+            isOneToOne: false
+            referencedRelation: "mensalidades"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "caixa_movimentos_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dependentes: {
         Row: {
           afiliado_id: string
@@ -620,6 +687,7 @@ export type Database = {
     Enums: {
       afiliado_status: "pendente" | "ativo" | "inativo" | "suspenso"
       app_role: "super_admin" | "admin" | "staff" | "afiliado"
+      caixa_kind: "entrada" | "saida"
       documento_categoria:
         | "estatuto"
         | "ata"
@@ -777,6 +845,7 @@ export const Constants = {
     Enums: {
       afiliado_status: ["pendente", "ativo", "inativo", "suspenso"],
       app_role: ["super_admin", "admin", "staff", "afiliado"],
+      caixa_kind: ["entrada", "saida"],
       documento_categoria: [
         "estatuto",
         "ata",
