@@ -354,6 +354,84 @@ function AfiliadosList() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Sheet de novo cadastro */}
+      <Sheet open={createOpen} onOpenChange={setCreateOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Novo afiliado</SheetTitle>
+            <SheetDescription>
+              Cadastro feito pela administração. A matrícula é gerada automaticamente.
+            </SheetDescription>
+          </SheetHeader>
+
+          <form
+            className="mt-6 space-y-5"
+            onSubmit={(e) => { e.preventDefault(); createAfiliado.mutate(); }}
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label className="text-xs">Nome completo*</Label>
+                <Input required value={form.full_name} onChange={(e) => setF("full_name", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">CPF*</Label>
+                <Input required maxLength={14} value={formatCPF(form.cpf)} onChange={(e) => setF("cpf", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">RG</Label>
+                <Input value={form.rg} onChange={(e) => setF("rg", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Data de nascimento</Label>
+                <Input type="date" value={form.birth_date} onChange={(e) => setF("birth_date", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Profissão</Label>
+                <Input value={form.profession} onChange={(e) => setF("profession", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Telefone</Label>
+                <Input value={formatPhone(form.phone)} onChange={(e) => setF("phone", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">E-mail</Label>
+                <Input type="email" value={form.email} onChange={(e) => setF("email", e.target.value)} />
+              </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label className="text-xs">Logradouro</Label>
+                <Input value={form.address_street} onChange={(e) => setF("address_street", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Número</Label>
+                <Input value={form.address_number} onChange={(e) => setF("address_number", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">CEP</Label>
+                <Input value={form.address_zip} onChange={(e) => setF("address_zip", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Cidade</Label>
+                <Input value={form.address_city} onChange={(e) => setF("address_city", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">UF</Label>
+                <Input maxLength={2} value={form.address_state} onChange={(e) => setF("address_state", e.target.value.toUpperCase())} />
+              </div>
+            </div>
+
+            <SheetFooter className="gap-2 sm:gap-2">
+              <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={createAfiliado.isPending}>
+                {createAfiliado.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Cadastrar afiliado
+              </Button>
+            </SheetFooter>
+          </form>
+        </SheetContent>
+      </Sheet>
     </AdminShell>
   );
 }
