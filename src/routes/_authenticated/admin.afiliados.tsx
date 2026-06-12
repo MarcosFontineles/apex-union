@@ -3,17 +3,21 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import {
   Search, Copy, ExternalLink, UserPlus, Upload, Download, FileText,
-  MoreHorizontal, Eye, CheckCircle2, XCircle, Pause, Check,
+  MoreHorizontal, Eye, CheckCircle2, XCircle, Pause, Check, Loader2,
 } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
 import { StatusBadge } from "./admin.index";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter,
+} from "@/components/ui/sheet";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
   DropdownMenuSeparator, DropdownMenuLabel,
@@ -37,8 +41,58 @@ function AfiliadosList() {
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<StatusFilter>("todos");
   const [linkOpen, setLinkOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+  const emptyForm = {
+    full_name: "", cpf: "", rg: "", birth_date: "", phone: "", email: "",
+    profession: "", address_street: "", address_number: "", address_city: "",
+    address_state: "", address_zip: "",
+  };
+  const [form, setForm] = useState(emptyForm);
+  const setF = <K extends keyof typeof emptyForm>(k: K, v: string) => setForm((s) => ({ ...s, [k]: v }));
 
   const signupUrl = tenant ? `${window.location.origin}/cadastro/${tenant.slug}` : "";
+
+  const createAfiliado = useMutation({
+    mutationFn: async () => {
+      if (!tenant?.id) throw new Error("Sindicato não selecionado");
+      if (!form.full_name.trim() || !form.cpf.trim()) throw new Error("Nome e CPF são obrigatórios");
+      const { data: mat, error: mErr } = await supabase.rpc("next_matricula", { _tenant_id: tenant.id });
+      if (mErr) throw mErr;
+      const { error } = await supabase.from("afiliados").insert({
+        tenant_id: tenant.id,
+        matricula: mat as string,
+        full_name: form.full_name.trim(),
+        cpf: form.cpf.replace(/\D/g, ""),
+        rg: form.rg || null,
+        birth_date: form.birth_date || null,
+        phone: form.phone.replace(/\D/g, "") || null,
+        email: form.email || null,
+        profession: form.profession || null,
+        address_street: form.address_street || null,
+        address_number: form.address_number || null,
+        address_city: form.address_city || null,
+        address_state: form.address_state || null,
+        address_zip: form.address_zip || null,
+        status: "ativo",
+        joined_at: new Date().toISOString().slice(0, 10),
+        consent_lgpd: true,
+        consent_lgpd_at: new Date().toISOString(),
+      });
+      if (error) throw error;
+      return mat as string;
+    },
+    onSuccess: (mat) => {
+      toast.success(`Afiliado cadastrado — matrícula ${mat}`);
+      setForm(emptyForm);
+      setCreateOpen(false);
+      qc.invalidateQueries({ queryKey: ["afiliados"] });
+      qc.invalidateQueries({ queryKey: ["admin-stats"] });
+    },
+    onError: (e) => {
+      const m = e instanceof Error ? e.message : "Erro ao cadastrar";
+      toast.error(m.includes("duplicate") ? "Já existe cadastro com esse CPF neste sindicato." : m);
+    },
+  });
 
   const { data, isLoading } = useQuery({
     queryKey: ["afiliados", tenant?.id, q, status],
@@ -150,11 +204,9 @@ function AfiliadosList() {
         {/* Toolbar de ações */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
-            <a href={signupUrl || "#"} target="_blank" rel="noreferrer">
-              <Button>
-                <UserPlus className="mr-2 h-4 w-4" /> Novo cadastro
-              </Button>
-            </a>
+            <Button onClick={() => setCreateOpen(true)} disabled={!tenant}>
+              <UserPlus className="mr-2 h-4 w-4" /> Novo cadastro
+            </Button>
             <Button variant="outline" onClick={copyLink} disabled={!tenant}>
               <Copy className="mr-2 h-4 w-4" /> Copiar link de auto-cadastro
             </Button>
@@ -302,6 +354,84 @@ function AfiliadosList() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Sheet de novo cadastro */}
+      <Sheet open={createOpen} onOpenChange={setCreateOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Novo afiliado</SheetTitle>
+            <SheetDescription>
+              Cadastro feito pela administração. A matrícula é gerada automaticamente.
+            </SheetDescription>
+          </SheetHeader>
+
+          <form
+            className="mt-6 space-y-5"
+            onSubmit={(e) => { e.preventDefault(); createAfiliado.mutate(); }}
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label className="text-xs">Nome completo*</Label>
+                <Input required value={form.full_name} onChange={(e) => setF("full_name", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">CPF*</Label>
+                <Input required maxLength={14} value={formatCPF(form.cpf)} onChange={(e) => setF("cpf", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">RG</Label>
+                <Input value={form.rg} onChange={(e) => setF("rg", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Data de nascimento</Label>
+                <Input type="date" value={form.birth_date} onChange={(e) => setF("birth_date", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Profissão</Label>
+                <Input value={form.profession} onChange={(e) => setF("profession", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Telefone</Label>
+                <Input value={formatPhone(form.phone)} onChange={(e) => setF("phone", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">E-mail</Label>
+                <Input type="email" value={form.email} onChange={(e) => setF("email", e.target.value)} />
+              </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label className="text-xs">Logradouro</Label>
+                <Input value={form.address_street} onChange={(e) => setF("address_street", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Número</Label>
+                <Input value={form.address_number} onChange={(e) => setF("address_number", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">CEP</Label>
+                <Input value={form.address_zip} onChange={(e) => setF("address_zip", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Cidade</Label>
+                <Input value={form.address_city} onChange={(e) => setF("address_city", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">UF</Label>
+                <Input maxLength={2} value={form.address_state} onChange={(e) => setF("address_state", e.target.value.toUpperCase())} />
+              </div>
+            </div>
+
+            <SheetFooter className="gap-2 sm:gap-2">
+              <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={createAfiliado.isPending}>
+                {createAfiliado.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Cadastrar afiliado
+              </Button>
+            </SheetFooter>
+          </form>
+        </SheetContent>
+      </Sheet>
     </AdminShell>
   );
 }

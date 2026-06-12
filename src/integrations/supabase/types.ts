@@ -487,6 +487,7 @@ export type Database = {
           id: string
           logo_url: string | null
           name: string
+          next_matricula: number
           primary_color: string
           slug: string
           status: Database["public"]["Enums"]["tenant_status"]
@@ -499,6 +500,7 @@ export type Database = {
           id?: string
           logo_url?: string | null
           name: string
+          next_matricula?: number
           primary_color?: string
           slug: string
           status?: Database["public"]["Enums"]["tenant_status"]
@@ -511,6 +513,7 @@ export type Database = {
           id?: string
           logo_url?: string | null
           name?: string
+          next_matricula?: number
           primary_color?: string
           slug?: string
           status?: Database["public"]["Enums"]["tenant_status"]
@@ -588,6 +591,7 @@ export type Database = {
         Args: { _tenant_id: string; _user_id: string }
         Returns: boolean
       }
+      next_matricula: { Args: { _tenant_id: string }; Returns: string }
       update_tenant_branding: {
         Args: {
           _accent_color: string
