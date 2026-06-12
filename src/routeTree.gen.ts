@@ -12,9 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedPortalIndexRouteImport } from './routes/_authenticated/portal.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedPortalJuridicoRouteImport } from './routes/_authenticated/portal.juridico'
+import { Route as AuthenticatedPortalFinanceiroRouteImport } from './routes/_authenticated/portal.financeiro'
+import { Route as AuthenticatedPortalCarteirinhaRouteImport } from './routes/_authenticated/portal.carteirinha'
 import { Route as AuthenticatedAdminJuridicoRouteImport } from './routes/_authenticated/admin.juridico'
 import { Route as AuthenticatedAdminFinanceiroRouteImport } from './routes/_authenticated/admin.financeiro'
 import { Route as AuthenticatedAdminDocumentosRouteImport } from './routes/_authenticated/admin.documentos'
@@ -36,6 +41,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   id: '/app',
   path: '/app',
@@ -46,11 +56,35 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPortalIndexRoute =
+  AuthenticatedPortalIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedPortalJuridicoRoute =
+  AuthenticatedPortalJuridicoRouteImport.update({
+    id: '/juridico',
+    path: '/juridico',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
+const AuthenticatedPortalFinanceiroRoute =
+  AuthenticatedPortalFinanceiroRouteImport.update({
+    id: '/financeiro',
+    path: '/financeiro',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
+const AuthenticatedPortalCarteirinhaRoute =
+  AuthenticatedPortalCarteirinhaRouteImport.update({
+    id: '/carteirinha',
+    path: '/carteirinha',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
 const AuthenticatedAdminJuridicoRoute =
   AuthenticatedAdminJuridicoRouteImport.update({
     id: '/juridico',
@@ -93,12 +127,17 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/app': typeof AuthenticatedAppRoute
+  '/portal': typeof AuthenticatedPortalRouteWithChildren
   '/admin/afiliados': typeof AuthenticatedAdminAfiliadosRouteWithChildren
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/admin/documentos': typeof AuthenticatedAdminDocumentosRoute
   '/admin/financeiro': typeof AuthenticatedAdminFinanceiroRoute
   '/admin/juridico': typeof AuthenticatedAdminJuridicoRoute
+  '/portal/carteirinha': typeof AuthenticatedPortalCarteirinhaRoute
+  '/portal/financeiro': typeof AuthenticatedPortalFinanceiroRoute
+  '/portal/juridico': typeof AuthenticatedPortalJuridicoRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/portal/': typeof AuthenticatedPortalIndexRoute
   '/admin/afiliados/$id': typeof AuthenticatedAdminAfiliadosIdRoute
 }
 export interface FileRoutesByTo {
@@ -110,7 +149,11 @@ export interface FileRoutesByTo {
   '/admin/documentos': typeof AuthenticatedAdminDocumentosRoute
   '/admin/financeiro': typeof AuthenticatedAdminFinanceiroRoute
   '/admin/juridico': typeof AuthenticatedAdminJuridicoRoute
+  '/portal/carteirinha': typeof AuthenticatedPortalCarteirinhaRoute
+  '/portal/financeiro': typeof AuthenticatedPortalFinanceiroRoute
+  '/portal/juridico': typeof AuthenticatedPortalJuridicoRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/portal': typeof AuthenticatedPortalIndexRoute
   '/admin/afiliados/$id': typeof AuthenticatedAdminAfiliadosIdRoute
 }
 export interface FileRoutesById {
@@ -120,12 +163,17 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/app': typeof AuthenticatedAppRoute
+  '/_authenticated/portal': typeof AuthenticatedPortalRouteWithChildren
   '/_authenticated/admin/afiliados': typeof AuthenticatedAdminAfiliadosRouteWithChildren
   '/_authenticated/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/_authenticated/admin/documentos': typeof AuthenticatedAdminDocumentosRoute
   '/_authenticated/admin/financeiro': typeof AuthenticatedAdminFinanceiroRoute
   '/_authenticated/admin/juridico': typeof AuthenticatedAdminJuridicoRoute
+  '/_authenticated/portal/carteirinha': typeof AuthenticatedPortalCarteirinhaRoute
+  '/_authenticated/portal/financeiro': typeof AuthenticatedPortalFinanceiroRoute
+  '/_authenticated/portal/juridico': typeof AuthenticatedPortalJuridicoRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/portal/': typeof AuthenticatedPortalIndexRoute
   '/_authenticated/admin/afiliados/$id': typeof AuthenticatedAdminAfiliadosIdRoute
 }
 export interface FileRouteTypes {
@@ -135,12 +183,17 @@ export interface FileRouteTypes {
     | '/auth'
     | '/admin'
     | '/app'
+    | '/portal'
     | '/admin/afiliados'
     | '/admin/configuracoes'
     | '/admin/documentos'
     | '/admin/financeiro'
     | '/admin/juridico'
+    | '/portal/carteirinha'
+    | '/portal/financeiro'
+    | '/portal/juridico'
     | '/admin/'
+    | '/portal/'
     | '/admin/afiliados/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -152,7 +205,11 @@ export interface FileRouteTypes {
     | '/admin/documentos'
     | '/admin/financeiro'
     | '/admin/juridico'
+    | '/portal/carteirinha'
+    | '/portal/financeiro'
+    | '/portal/juridico'
     | '/admin'
+    | '/portal'
     | '/admin/afiliados/$id'
   id:
     | '__root__'
@@ -161,12 +218,17 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/admin'
     | '/_authenticated/app'
+    | '/_authenticated/portal'
     | '/_authenticated/admin/afiliados'
     | '/_authenticated/admin/configuracoes'
     | '/_authenticated/admin/documentos'
     | '/_authenticated/admin/financeiro'
     | '/_authenticated/admin/juridico'
+    | '/_authenticated/portal/carteirinha'
+    | '/_authenticated/portal/financeiro'
+    | '/_authenticated/portal/juridico'
     | '/_authenticated/admin/'
+    | '/_authenticated/portal/'
     | '/_authenticated/admin/afiliados/$id'
   fileRoutesById: FileRoutesById
 }
@@ -199,6 +261,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/portal': {
+      id: '/_authenticated/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof AuthenticatedPortalRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/app': {
       id: '/_authenticated/app'
       path: '/app'
@@ -213,12 +282,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/portal/': {
+      id: '/_authenticated/portal/'
+      path: '/'
+      fullPath: '/portal/'
+      preLoaderRoute: typeof AuthenticatedPortalIndexRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/portal/juridico': {
+      id: '/_authenticated/portal/juridico'
+      path: '/juridico'
+      fullPath: '/portal/juridico'
+      preLoaderRoute: typeof AuthenticatedPortalJuridicoRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
+    }
+    '/_authenticated/portal/financeiro': {
+      id: '/_authenticated/portal/financeiro'
+      path: '/financeiro'
+      fullPath: '/portal/financeiro'
+      preLoaderRoute: typeof AuthenticatedPortalFinanceiroRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
+    }
+    '/_authenticated/portal/carteirinha': {
+      id: '/_authenticated/portal/carteirinha'
+      path: '/carteirinha'
+      fullPath: '/portal/carteirinha'
+      preLoaderRoute: typeof AuthenticatedPortalCarteirinhaRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
     }
     '/_authenticated/admin/juridico': {
       id: '/_authenticated/admin/juridico'
@@ -301,14 +398,33 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
+interface AuthenticatedPortalRouteChildren {
+  AuthenticatedPortalCarteirinhaRoute: typeof AuthenticatedPortalCarteirinhaRoute
+  AuthenticatedPortalFinanceiroRoute: typeof AuthenticatedPortalFinanceiroRoute
+  AuthenticatedPortalJuridicoRoute: typeof AuthenticatedPortalJuridicoRoute
+  AuthenticatedPortalIndexRoute: typeof AuthenticatedPortalIndexRoute
+}
+
+const AuthenticatedPortalRouteChildren: AuthenticatedPortalRouteChildren = {
+  AuthenticatedPortalCarteirinhaRoute: AuthenticatedPortalCarteirinhaRoute,
+  AuthenticatedPortalFinanceiroRoute: AuthenticatedPortalFinanceiroRoute,
+  AuthenticatedPortalJuridicoRoute: AuthenticatedPortalJuridicoRoute,
+  AuthenticatedPortalIndexRoute: AuthenticatedPortalIndexRoute,
+}
+
+const AuthenticatedPortalRouteWithChildren =
+  AuthenticatedPortalRoute._addFileChildren(AuthenticatedPortalRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
+  AuthenticatedPortalRoute: typeof AuthenticatedPortalRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedAppRoute: AuthenticatedAppRoute,
+  AuthenticatedPortalRoute: AuthenticatedPortalRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -322,3 +438,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
