@@ -34,6 +34,7 @@ type StatusFilter = "todos" | "ativo" | "pendente" | "inativo" | "suspenso";
 
 function AfiliadosList() {
   const { tenant } = useTenant();
+  const navigate = useNavigate();
   const qc = useQueryClient();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<StatusFilter>("todos");
