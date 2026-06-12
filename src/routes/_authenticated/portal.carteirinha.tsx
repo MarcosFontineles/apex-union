@@ -1,21 +1,38 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
-import { QRCodeSVG } from "qrcode.react";
-import { Building2, RotateCw, ShieldCheck } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { QRCodeCanvas, QRCodeSVG } from "qrcode.react";
+import { Building2, Download, RotateCw, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { formatCPF, formatDate } from "@/lib/format";
+import { generateCarteirinhaPDF } from "@/lib/carteirinha-pdf";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/portal/carteirinha")({
   component: Carteirinha,
 });
 
+async function urlToDataUrl(url: string): Promise<string | null> {
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    return await new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result as string);
+      r.onerror = reject;
+      r.readAsDataURL(blob);
+    });
+  } catch { return null; }
+}
+
 function Carteirinha() {
   const { user } = useAuth();
   const [flipped, setFlipped] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const qrRef = useRef<HTMLDivElement>(null);
 
   const { data } = useQuery({
     queryKey: ["carteirinha", user?.id],
@@ -32,7 +49,14 @@ function Carteirinha() {
         .select("name, logo_url, primary_color, accent_color")
         .eq("id", a.tenant_id)
         .maybeSingle();
-      return { a, t };
+      let photoSigned: string | null = null;
+      if (a.photo_url) {
+        const path = a.photo_url.split("/afiliado-fotos/")[1] ?? a.photo_url;
+        const { data: signed } = await supabase.storage
+          .from("afiliado-fotos").createSignedUrl(path, 600);
+        photoSigned = signed?.signedUrl ?? null;
+      }
+      return { a, t, photoSigned };
     },
   });
 
@@ -41,21 +65,52 @@ function Carteirinha() {
     [data?.a],
   );
 
+  const handleDownload = async () => {
+    if (!data?.a || !data.t) return;
+    setDownloading(true);
+    try {
+      const photo_data_url = data.photoSigned ? await urlToDataUrl(data.photoSigned) : null;
+      const canvas = qrRef.current?.querySelector("canvas") as HTMLCanvasElement | null;
+      const qr_data_url = canvas?.toDataURL("image/png") ?? null;
+      generateCarteirinhaPDF({
+        full_name: data.a.full_name,
+        matricula: data.a.matricula,
+        cpf: formatCPF(data.a.cpf),
+        joined_at: data.a.joined_at ? formatDate(data.a.joined_at) : null,
+        tenant_name: data.t.name ?? "Sindicato",
+        primary_color: data.t.primary_color ?? "#1E40AF",
+        accent_color: data.t.accent_color ?? "#3B82F6",
+        verify_url: verifyUrl,
+        photo_data_url,
+        qr_data_url,
+      });
+      toast.success("PDF gerado");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao gerar PDF");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   if (!data?.a) {
     return <Card className="p-6 text-sm text-muted-foreground">Carteirinha indisponível.</Card>;
   }
 
-  const { a, t } = data;
+  const { a, t, photoSigned } = data;
 
   return (
     <div className="space-y-4">
+      {/* hidden canvas QR for PDF capture */}
+      <div ref={qrRef} className="hidden">
+        <QRCodeCanvas value={verifyUrl} size={256} level="M" />
+      </div>
+
       <div className="perspective-[1200px]">
         <div
           onClick={() => setFlipped((f) => !f)}
           className="relative h-[230px] cursor-pointer transition-transform duration-700 [transform-style:preserve-3d]"
           style={{ transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)" }}
         >
-          {/* FRONT */}
           <CardFace>
             <div className="flex h-full flex-col justify-between p-5 text-primary-foreground">
               <div className="flex items-start justify-between">
@@ -70,8 +125,8 @@ function Carteirinha() {
 
               <div className="flex items-end gap-4">
                 <div className="flex h-20 w-16 items-center justify-center overflow-hidden rounded-md bg-primary-foreground/10 ring-1 ring-primary-foreground/20">
-                  {a.photo_url ? (
-                    <img src={a.photo_url} alt={a.full_name} className="h-full w-full object-cover" />
+                  {photoSigned ? (
+                    <img src={photoSigned} alt={a.full_name} className="h-full w-full object-cover" />
                   ) : (
                     <span className="text-2xl font-semibold opacity-60">{a.full_name?.[0]}</span>
                   )}
@@ -91,7 +146,6 @@ function Carteirinha() {
             </div>
           </CardFace>
 
-          {/* BACK */}
           <CardFace back>
             <div className="grid h-full grid-cols-[1fr_auto] gap-4 p-5 text-foreground">
               <div className="flex flex-col justify-between">
@@ -115,13 +169,19 @@ function Carteirinha() {
         </div>
       </div>
 
-      <Button variant="outline" className="w-full" onClick={() => setFlipped((f) => !f)}>
-        <RotateCw className="mr-2 h-4 w-4" />
-        {flipped ? "Ver frente" : "Ver verso (QR Code)"}
-      </Button>
+      <div className="grid grid-cols-2 gap-2">
+        <Button variant="outline" onClick={() => setFlipped((f) => !f)}>
+          <RotateCw className="mr-2 h-4 w-4" />
+          {flipped ? "Frente" : "Verso"}
+        </Button>
+        <Button onClick={handleDownload} disabled={downloading}>
+          <Download className="mr-2 h-4 w-4" />
+          {downloading ? "Gerando…" : "Baixar PDF"}
+        </Button>
+      </div>
 
       <p className="text-center text-xs text-muted-foreground">
-        Toque na carteirinha para girar. A validação pública confirma seu vínculo em tempo real.
+        Toque na carteirinha para girar. O PDF gerado tem tamanho real (85,6 × 54 mm).
       </p>
     </div>
   );
