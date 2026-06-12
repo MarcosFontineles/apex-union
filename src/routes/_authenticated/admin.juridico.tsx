@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatDate } from "@/lib/format";
 import { toast } from "sonner";
+import { AfiliadoPicker } from "@/components/afiliado-picker";
 
 export const Route = createFileRoute("/_authenticated/admin/juridico")({
   component: JuridicoList,
