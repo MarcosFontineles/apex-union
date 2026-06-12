@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Wallet, CheckCircle2, Plus, AlertCircle, FileText, Loader2 } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,10 +13,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import {
-  Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,
-} from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { AfiliadoPicker } from "@/components/afiliado-picker";
 import { useTenant } from "@/hooks/use-tenant";
 import { formatDate } from "@/lib/format";
 import { toast } from "sonner";
@@ -238,7 +235,6 @@ function NovaCobrancaDialog({ tenantId }: { tenantId?: string }) {
   const defaultComp = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
 
   const [afiliadoId, setAfiliadoId] = useState<string>("");
-  const [pickerOpen, setPickerOpen] = useState(false);
   const [valor, setValor] = useState("50.00");
   const [parcelas, setParcelas] = useState("1");
   const [comp, setComp] = useState(defaultComp);
@@ -246,25 +242,6 @@ function NovaCobrancaDialog({ tenantId }: { tenantId?: string }) {
   const [method, setMethod] = useState<string>("pix");
   const [descricao, setDescricao] = useState("");
 
-  const { data: afiliados } = useQuery({
-    queryKey: ["afiliados-pick", tenantId],
-    enabled: !!tenantId && open,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("afiliados")
-        .select("id, matricula, full_name")
-        .eq("tenant_id", tenantId!)
-        .order("full_name", { ascending: true })
-        .limit(1000);
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
-
-  const selected = useMemo(
-    () => afiliados?.find((a) => a.id === afiliadoId),
-    [afiliados, afiliadoId],
-  );
 
   const reset = () => {
     setAfiliadoId(""); setValor("50.00"); setParcelas("1");
@@ -324,34 +301,15 @@ function NovaCobrancaDialog({ tenantId }: { tenantId?: string }) {
         <div className="grid gap-4 py-2">
           <div>
             <Label className="text-xs">Afiliado</Label>
-            <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="mt-1 w-full justify-between font-normal">
-                  {selected ? `${selected.matricula} • ${selected.full_name}` : "Selecionar afiliado…"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="p-0 w-[--radix-popover-trigger-width]" align="start">
-                <Command>
-                  <CommandInput placeholder="Buscar por nome ou matrícula…" />
-                  <CommandList>
-                    <CommandEmpty>Nenhum afiliado encontrado.</CommandEmpty>
-                    <CommandGroup>
-                      {afiliados?.map((a) => (
-                        <CommandItem
-                          key={a.id}
-                          value={`${a.matricula} ${a.full_name}`}
-                          onSelect={() => { setAfiliadoId(a.id); setPickerOpen(false); }}
-                        >
-                          <span className="font-mono text-xs text-muted-foreground mr-2">{a.matricula}</span>
-                          {a.full_name}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
+            <div className="mt-1">
+              <AfiliadoPicker
+                tenantId={tenantId}
+                value={afiliadoId}
+                onChange={setAfiliadoId}
+              />
+            </div>
           </div>
+
 
           <div>
             <Label className="text-xs">Descrição (opcional)</Label>
