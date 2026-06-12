@@ -120,13 +120,14 @@ function JuridicoList() {
                   </Select>
                 </F>
                 <F label="Afiliado relacionado">
-                  <Select value={form.afiliado_id} onValueChange={(v) => setForm({ ...form, afiliado_id: v })}>
-                    <SelectTrigger><SelectValue placeholder="(opcional)" /></SelectTrigger>
-                    <SelectContent>
-                      {afiliados?.map((a) => <SelectItem key={a.id} value={a.id}>{a.full_name} · {a.matricula}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
+                  <AfiliadoPicker
+                    tenantId={tenant?.id}
+                    value={form.afiliado_id}
+                    onChange={(v) => setForm({ ...form, afiliado_id: v })}
+                    placeholder="(opcional) selecionar afiliado…"
+                  />
                 </F>
+
                 <F label="Vara"><Input value={form.vara} onChange={(e) => setForm({ ...form, vara: e.target.value })} /></F>
                 <F label="Comarca"><Input value={form.comarca} onChange={(e) => setForm({ ...form, comarca: e.target.value })} /></F>
                 <F label="UF"><Input maxLength={2} value={form.uf} onChange={(e) => setForm({ ...form, uf: e.target.value.toUpperCase() })} /></F>
