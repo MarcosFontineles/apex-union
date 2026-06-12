@@ -288,10 +288,8 @@ function AfiliadosList() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                          <DropdownMenuItem asChild>
-                            <Link to="/admin/afiliados/$id" params={{ id: a.id }}>
-                              <Eye className="mr-2 h-4 w-4" /> Abrir cadastro
-                            </Link>
+                          <DropdownMenuItem onSelect={() => navigate({ to: "/admin/afiliados/$id", params: { id: a.id } })}>
+                            <Eye className="mr-2 h-4 w-4" /> Abrir cadastro
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           {a.status !== "ativo" && (
