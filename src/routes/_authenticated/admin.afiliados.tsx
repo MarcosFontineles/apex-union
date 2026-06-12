@@ -208,9 +208,6 @@ function AfiliadosList() {
             <Button variant="outline" onClick={copyLink} disabled={!tenant}>
               <Copy className="mr-2 h-4 w-4" /> Copiar link de auto-cadastro
             </Button>
-            <Link to="/admin/importar">
-              <Button variant="outline"><Upload className="mr-2 h-4 w-4" /> Importar CSV</Button>
-            </Link>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={exportCSV}>
