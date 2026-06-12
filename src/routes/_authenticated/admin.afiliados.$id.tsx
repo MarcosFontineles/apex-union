@@ -29,7 +29,7 @@ function AfiliadoDetail() {
 
   const setStatus = useMutation({
     mutationFn: async (status: "ativo" | "inativo" | "suspenso" | "pendente") => {
-      const patch: Record<string, unknown> = { status };
+      const patch: { status: typeof status; joined_at?: string } = { status };
       if (status === "ativo" && !a?.joined_at) patch.joined_at = new Date().toISOString().slice(0, 10);
       const { error } = await supabase.from("afiliados").update(patch).eq("id", id);
       if (error) throw error;
