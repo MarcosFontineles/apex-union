@@ -321,34 +321,15 @@ function NovaCobrancaDialog({ tenantId }: { tenantId?: string }) {
         <div className="grid gap-4 py-2">
           <div>
             <Label className="text-xs">Afiliado</Label>
-            <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="mt-1 w-full justify-between font-normal">
-                  {selected ? `${selected.matricula} • ${selected.full_name}` : "Selecionar afiliado…"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="p-0 w-[--radix-popover-trigger-width]" align="start">
-                <Command>
-                  <CommandInput placeholder="Buscar por nome ou matrícula…" />
-                  <CommandList>
-                    <CommandEmpty>Nenhum afiliado encontrado.</CommandEmpty>
-                    <CommandGroup>
-                      {afiliados?.map((a) => (
-                        <CommandItem
-                          key={a.id}
-                          value={`${a.matricula} ${a.full_name}`}
-                          onSelect={() => { setAfiliadoId(a.id); setPickerOpen(false); }}
-                        >
-                          <span className="font-mono text-xs text-muted-foreground mr-2">{a.matricula}</span>
-                          {a.full_name}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
+            <div className="mt-1">
+              <AfiliadoPicker
+                tenantId={tenantId}
+                value={afiliadoId}
+                onChange={setAfiliadoId}
+              />
+            </div>
           </div>
+
 
           <div>
             <Label className="text-xs">Descrição (opcional)</Label>
