@@ -51,7 +51,7 @@ function Configuracoes() {
       const { error } = await supabase.rpc("update_tenant_branding", {
         _tenant_id: tenant.id,
         _name: name,
-        _logo_url: logoPath,
+        _logo_url: logoPath ?? "",
         _primary_color: primary,
         _accent_color: accent,
       });
