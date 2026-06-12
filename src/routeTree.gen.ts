@@ -29,6 +29,7 @@ import { Route as AuthenticatedAdminImportarRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminFinanceiroRouteImport } from './routes/_authenticated/admin.financeiro'
 import { Route as AuthenticatedAdminDocumentosRouteImport } from './routes/_authenticated/admin.documentos'
 import { Route as AuthenticatedAdminConfiguracoesRouteImport } from './routes/_authenticated/admin.configuracoes'
+import { Route as AuthenticatedAdminCaixaRouteImport } from './routes/_authenticated/admin.caixa'
 import { Route as AuthenticatedAdminAfiliadosRouteImport } from './routes/_authenticated/admin.afiliados'
 import { Route as AuthenticatedAdminJuridicoIdRouteImport } from './routes/_authenticated/admin.juridico.$id'
 import { Route as AuthenticatedAdminAfiliadosIdRouteImport } from './routes/_authenticated/admin.afiliados.$id'
@@ -142,6 +143,11 @@ const AuthenticatedAdminConfiguracoesRoute =
     path: '/configuracoes',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminCaixaRoute = AuthenticatedAdminCaixaRouteImport.update({
+  id: '/caixa',
+  path: '/caixa',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedAdminAfiliadosRoute =
   AuthenticatedAdminAfiliadosRouteImport.update({
     id: '/afiliados',
@@ -171,6 +177,7 @@ export interface FileRoutesByFullPath {
   '/cadastro/$slug': typeof CadastroSlugRoute
   '/verificar/$id': typeof VerificarIdRoute
   '/admin/afiliados': typeof AuthenticatedAdminAfiliadosRouteWithChildren
+  '/admin/caixa': typeof AuthenticatedAdminCaixaRoute
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/admin/documentos': typeof AuthenticatedAdminDocumentosRoute
   '/admin/financeiro': typeof AuthenticatedAdminFinanceiroRoute
@@ -193,6 +200,7 @@ export interface FileRoutesByTo {
   '/cadastro/$slug': typeof CadastroSlugRoute
   '/verificar/$id': typeof VerificarIdRoute
   '/admin/afiliados': typeof AuthenticatedAdminAfiliadosRouteWithChildren
+  '/admin/caixa': typeof AuthenticatedAdminCaixaRoute
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/admin/documentos': typeof AuthenticatedAdminDocumentosRoute
   '/admin/financeiro': typeof AuthenticatedAdminFinanceiroRoute
@@ -219,6 +227,7 @@ export interface FileRoutesById {
   '/cadastro/$slug': typeof CadastroSlugRoute
   '/verificar/$id': typeof VerificarIdRoute
   '/_authenticated/admin/afiliados': typeof AuthenticatedAdminAfiliadosRouteWithChildren
+  '/_authenticated/admin/caixa': typeof AuthenticatedAdminCaixaRoute
   '/_authenticated/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/_authenticated/admin/documentos': typeof AuthenticatedAdminDocumentosRoute
   '/_authenticated/admin/financeiro': typeof AuthenticatedAdminFinanceiroRoute
@@ -245,6 +254,7 @@ export interface FileRouteTypes {
     | '/cadastro/$slug'
     | '/verificar/$id'
     | '/admin/afiliados'
+    | '/admin/caixa'
     | '/admin/configuracoes'
     | '/admin/documentos'
     | '/admin/financeiro'
@@ -267,6 +277,7 @@ export interface FileRouteTypes {
     | '/cadastro/$slug'
     | '/verificar/$id'
     | '/admin/afiliados'
+    | '/admin/caixa'
     | '/admin/configuracoes'
     | '/admin/documentos'
     | '/admin/financeiro'
@@ -292,6 +303,7 @@ export interface FileRouteTypes {
     | '/cadastro/$slug'
     | '/verificar/$id'
     | '/_authenticated/admin/afiliados'
+    | '/_authenticated/admin/caixa'
     | '/_authenticated/admin/configuracoes'
     | '/_authenticated/admin/documentos'
     | '/_authenticated/admin/financeiro'
@@ -458,6 +470,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminConfiguracoesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/caixa': {
+      id: '/_authenticated/admin/caixa'
+      path: '/caixa'
+      fullPath: '/admin/caixa'
+      preLoaderRoute: typeof AuthenticatedAdminCaixaRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/afiliados': {
       id: '/_authenticated/admin/afiliados'
       path: '/afiliados'
@@ -512,6 +531,7 @@ const AuthenticatedAdminJuridicoRouteWithChildren =
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAfiliadosRoute: typeof AuthenticatedAdminAfiliadosRouteWithChildren
+  AuthenticatedAdminCaixaRoute: typeof AuthenticatedAdminCaixaRoute
   AuthenticatedAdminConfiguracoesRoute: typeof AuthenticatedAdminConfiguracoesRoute
   AuthenticatedAdminDocumentosRoute: typeof AuthenticatedAdminDocumentosRoute
   AuthenticatedAdminFinanceiroRoute: typeof AuthenticatedAdminFinanceiroRoute
@@ -524,6 +544,7 @@ interface AuthenticatedAdminRouteChildren {
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAfiliadosRoute:
     AuthenticatedAdminAfiliadosRouteWithChildren,
+  AuthenticatedAdminCaixaRoute: AuthenticatedAdminCaixaRoute,
   AuthenticatedAdminConfiguracoesRoute: AuthenticatedAdminConfiguracoesRoute,
   AuthenticatedAdminDocumentosRoute: AuthenticatedAdminDocumentosRoute,
   AuthenticatedAdminFinanceiroRoute: AuthenticatedAdminFinanceiroRoute,
