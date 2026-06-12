@@ -41,8 +41,58 @@ function AfiliadosList() {
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<StatusFilter>("todos");
   const [linkOpen, setLinkOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+  const emptyForm = {
+    full_name: "", cpf: "", rg: "", birth_date: "", phone: "", email: "",
+    profession: "", address_street: "", address_number: "", address_city: "",
+    address_state: "", address_zip: "",
+  };
+  const [form, setForm] = useState(emptyForm);
+  const setF = <K extends keyof typeof emptyForm>(k: K, v: string) => setForm((s) => ({ ...s, [k]: v }));
 
   const signupUrl = tenant ? `${window.location.origin}/cadastro/${tenant.slug}` : "";
+
+  const createAfiliado = useMutation({
+    mutationFn: async () => {
+      if (!tenant?.id) throw new Error("Sindicato não selecionado");
+      if (!form.full_name.trim() || !form.cpf.trim()) throw new Error("Nome e CPF são obrigatórios");
+      const { data: mat, error: mErr } = await supabase.rpc("next_matricula", { _tenant_id: tenant.id });
+      if (mErr) throw mErr;
+      const { error } = await supabase.from("afiliados").insert({
+        tenant_id: tenant.id,
+        matricula: mat as string,
+        full_name: form.full_name.trim(),
+        cpf: form.cpf.replace(/\D/g, ""),
+        rg: form.rg || null,
+        birth_date: form.birth_date || null,
+        phone: form.phone.replace(/\D/g, "") || null,
+        email: form.email || null,
+        profession: form.profession || null,
+        address_street: form.address_street || null,
+        address_number: form.address_number || null,
+        address_city: form.address_city || null,
+        address_state: form.address_state || null,
+        address_zip: form.address_zip || null,
+        status: "ativo",
+        joined_at: new Date().toISOString().slice(0, 10),
+        consent_lgpd: true,
+        consent_lgpd_at: new Date().toISOString(),
+      });
+      if (error) throw error;
+      return mat as string;
+    },
+    onSuccess: (mat) => {
+      toast.success(`Afiliado cadastrado — matrícula ${mat}`);
+      setForm(emptyForm);
+      setCreateOpen(false);
+      qc.invalidateQueries({ queryKey: ["afiliados"] });
+      qc.invalidateQueries({ queryKey: ["admin-stats"] });
+    },
+    onError: (e) => {
+      const m = e instanceof Error ? e.message : "Erro ao cadastrar";
+      toast.error(m.includes("duplicate") ? "Já existe cadastro com esse CPF neste sindicato." : m);
+    },
+  });
 
   const { data, isLoading } = useQuery({
     queryKey: ["afiliados", tenant?.id, q, status],
