@@ -7,14 +7,15 @@ import { initials } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 
-const NAV = [
+type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean };
+const NAV: NavItem[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/afiliados", label: "Afiliados", icon: Users },
-  { to: "/admin/financeiro", label: "Financeiro", icon: Wallet },
-  { to: "/admin/juridico", label: "Jurídico", icon: Gavel },
-  { to: "/admin/documentos", label: "Documentos", icon: FileText },
-  { to: "/admin/configuracoes", label: "Configurações", icon: Settings },
-] as const;
+  { to: "/admin/financeiro", label: "Financeiro", icon: Wallet, exact: false },
+  { to: "/admin/juridico", label: "Jurídico", icon: Gavel, exact: false },
+  { to: "/admin/documentos", label: "Documentos", icon: FileText, exact: false },
+  { to: "/admin/configuracoes", label: "Configurações", icon: Settings, exact: false },
+];
 
 export function AdminShell({ children, title }: { children: React.ReactNode; title?: string }) {
   const { profile } = useAuth();
