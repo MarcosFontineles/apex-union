@@ -100,6 +100,8 @@ function AfiliadoDetail() {
           </div>
 
           <div className="space-y-6">
+            <PhotoCard afiliadoId={a.id} tenantId={a.tenant_id} fullName={a.full_name} photoUrl={a.photo_url} />
+
             <Card className="shadow-card">
               <CardHeader><CardTitle className="text-base">Ações</CardTitle></CardHeader>
               <CardContent className="space-y-2">
