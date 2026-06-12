@@ -9,38 +9,277 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VerificarIdRouteImport } from './routes/verificar.$id'
+import { Route as CadastroSlugRouteImport } from './routes/cadastro.$slug'
+import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
+import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedPortalIndexRouteImport } from './routes/_authenticated/portal.index'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedPortalJuridicoRouteImport } from './routes/_authenticated/portal.juridico'
+import { Route as AuthenticatedPortalFinanceiroRouteImport } from './routes/_authenticated/portal.financeiro'
+import { Route as AuthenticatedPortalCarteirinhaRouteImport } from './routes/_authenticated/portal.carteirinha'
+import { Route as AuthenticatedAdminJuridicoRouteImport } from './routes/_authenticated/admin.juridico'
+import { Route as AuthenticatedAdminFinanceiroRouteImport } from './routes/_authenticated/admin.financeiro'
+import { Route as AuthenticatedAdminDocumentosRouteImport } from './routes/_authenticated/admin.documentos'
+import { Route as AuthenticatedAdminConfiguracoesRouteImport } from './routes/_authenticated/admin.configuracoes'
+import { Route as AuthenticatedAdminAfiliadosRouteImport } from './routes/_authenticated/admin.afiliados'
+import { Route as AuthenticatedAdminAfiliadosIdRouteImport } from './routes/_authenticated/admin.afiliados.$id'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VerificarIdRoute = VerificarIdRouteImport.update({
+  id: '/verificar/$id',
+  path: '/verificar/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CadastroSlugRoute = CadastroSlugRouteImport.update({
+  id: '/cadastro/$slug',
+  path: '/cadastro/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPortalIndexRoute =
+  AuthenticatedPortalIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedPortalJuridicoRoute =
+  AuthenticatedPortalJuridicoRouteImport.update({
+    id: '/juridico',
+    path: '/juridico',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
+const AuthenticatedPortalFinanceiroRoute =
+  AuthenticatedPortalFinanceiroRouteImport.update({
+    id: '/financeiro',
+    path: '/financeiro',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
+const AuthenticatedPortalCarteirinhaRoute =
+  AuthenticatedPortalCarteirinhaRouteImport.update({
+    id: '/carteirinha',
+    path: '/carteirinha',
+    getParentRoute: () => AuthenticatedPortalRoute,
+  } as any)
+const AuthenticatedAdminJuridicoRoute =
+  AuthenticatedAdminJuridicoRouteImport.update({
+    id: '/juridico',
+    path: '/juridico',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminFinanceiroRoute =
+  AuthenticatedAdminFinanceiroRouteImport.update({
+    id: '/financeiro',
+    path: '/financeiro',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminDocumentosRoute =
+  AuthenticatedAdminDocumentosRouteImport.update({
+    id: '/documentos',
+    path: '/documentos',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminConfiguracoesRoute =
+  AuthenticatedAdminConfiguracoesRouteImport.update({
+    id: '/configuracoes',
+    path: '/configuracoes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminAfiliadosRoute =
+  AuthenticatedAdminAfiliadosRouteImport.update({
+    id: '/afiliados',
+    path: '/afiliados',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminAfiliadosIdRoute =
+  AuthenticatedAdminAfiliadosIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedAdminAfiliadosRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/app': typeof AuthenticatedAppRoute
+  '/portal': typeof AuthenticatedPortalRouteWithChildren
+  '/cadastro/$slug': typeof CadastroSlugRoute
+  '/verificar/$id': typeof VerificarIdRoute
+  '/admin/afiliados': typeof AuthenticatedAdminAfiliadosRouteWithChildren
+  '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/admin/documentos': typeof AuthenticatedAdminDocumentosRoute
+  '/admin/financeiro': typeof AuthenticatedAdminFinanceiroRoute
+  '/admin/juridico': typeof AuthenticatedAdminJuridicoRoute
+  '/portal/carteirinha': typeof AuthenticatedPortalCarteirinhaRoute
+  '/portal/financeiro': typeof AuthenticatedPortalFinanceiroRoute
+  '/portal/juridico': typeof AuthenticatedPortalJuridicoRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/portal/': typeof AuthenticatedPortalIndexRoute
+  '/admin/afiliados/$id': typeof AuthenticatedAdminAfiliadosIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/app': typeof AuthenticatedAppRoute
+  '/cadastro/$slug': typeof CadastroSlugRoute
+  '/verificar/$id': typeof VerificarIdRoute
+  '/admin/afiliados': typeof AuthenticatedAdminAfiliadosRouteWithChildren
+  '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/admin/documentos': typeof AuthenticatedAdminDocumentosRoute
+  '/admin/financeiro': typeof AuthenticatedAdminFinanceiroRoute
+  '/admin/juridico': typeof AuthenticatedAdminJuridicoRoute
+  '/portal/carteirinha': typeof AuthenticatedPortalCarteirinhaRoute
+  '/portal/financeiro': typeof AuthenticatedPortalFinanceiroRoute
+  '/portal/juridico': typeof AuthenticatedPortalJuridicoRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
+  '/portal': typeof AuthenticatedPortalIndexRoute
+  '/admin/afiliados/$id': typeof AuthenticatedAdminAfiliadosIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/app': typeof AuthenticatedAppRoute
+  '/_authenticated/portal': typeof AuthenticatedPortalRouteWithChildren
+  '/cadastro/$slug': typeof CadastroSlugRoute
+  '/verificar/$id': typeof VerificarIdRoute
+  '/_authenticated/admin/afiliados': typeof AuthenticatedAdminAfiliadosRouteWithChildren
+  '/_authenticated/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/_authenticated/admin/documentos': typeof AuthenticatedAdminDocumentosRoute
+  '/_authenticated/admin/financeiro': typeof AuthenticatedAdminFinanceiroRoute
+  '/_authenticated/admin/juridico': typeof AuthenticatedAdminJuridicoRoute
+  '/_authenticated/portal/carteirinha': typeof AuthenticatedPortalCarteirinhaRoute
+  '/_authenticated/portal/financeiro': typeof AuthenticatedPortalFinanceiroRoute
+  '/_authenticated/portal/juridico': typeof AuthenticatedPortalJuridicoRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/portal/': typeof AuthenticatedPortalIndexRoute
+  '/_authenticated/admin/afiliados/$id': typeof AuthenticatedAdminAfiliadosIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/admin'
+    | '/app'
+    | '/portal'
+    | '/cadastro/$slug'
+    | '/verificar/$id'
+    | '/admin/afiliados'
+    | '/admin/configuracoes'
+    | '/admin/documentos'
+    | '/admin/financeiro'
+    | '/admin/juridico'
+    | '/portal/carteirinha'
+    | '/portal/financeiro'
+    | '/portal/juridico'
+    | '/admin/'
+    | '/portal/'
+    | '/admin/afiliados/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/app'
+    | '/cadastro/$slug'
+    | '/verificar/$id'
+    | '/admin/afiliados'
+    | '/admin/configuracoes'
+    | '/admin/documentos'
+    | '/admin/financeiro'
+    | '/admin/juridico'
+    | '/portal/carteirinha'
+    | '/portal/financeiro'
+    | '/portal/juridico'
+    | '/admin'
+    | '/portal'
+    | '/admin/afiliados/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/admin'
+    | '/_authenticated/app'
+    | '/_authenticated/portal'
+    | '/cadastro/$slug'
+    | '/verificar/$id'
+    | '/_authenticated/admin/afiliados'
+    | '/_authenticated/admin/configuracoes'
+    | '/_authenticated/admin/documentos'
+    | '/_authenticated/admin/financeiro'
+    | '/_authenticated/admin/juridico'
+    | '/_authenticated/portal/carteirinha'
+    | '/_authenticated/portal/financeiro'
+    | '/_authenticated/portal/juridico'
+    | '/_authenticated/admin/'
+    | '/_authenticated/portal/'
+    | '/_authenticated/admin/afiliados/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  CadastroSlugRoute: typeof CadastroSlugRoute
+  VerificarIdRoute: typeof VerificarIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +287,196 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/verificar/$id': {
+      id: '/verificar/$id'
+      path: '/verificar/$id'
+      fullPath: '/verificar/$id'
+      preLoaderRoute: typeof VerificarIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cadastro/$slug': {
+      id: '/cadastro/$slug'
+      path: '/cadastro/$slug'
+      fullPath: '/cadastro/$slug'
+      preLoaderRoute: typeof CadastroSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/portal': {
+      id: '/_authenticated/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof AuthenticatedPortalRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/app': {
+      id: '/_authenticated/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AuthenticatedAppRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/portal/': {
+      id: '/_authenticated/portal/'
+      path: '/'
+      fullPath: '/portal/'
+      preLoaderRoute: typeof AuthenticatedPortalIndexRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/portal/juridico': {
+      id: '/_authenticated/portal/juridico'
+      path: '/juridico'
+      fullPath: '/portal/juridico'
+      preLoaderRoute: typeof AuthenticatedPortalJuridicoRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
+    }
+    '/_authenticated/portal/financeiro': {
+      id: '/_authenticated/portal/financeiro'
+      path: '/financeiro'
+      fullPath: '/portal/financeiro'
+      preLoaderRoute: typeof AuthenticatedPortalFinanceiroRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
+    }
+    '/_authenticated/portal/carteirinha': {
+      id: '/_authenticated/portal/carteirinha'
+      path: '/carteirinha'
+      fullPath: '/portal/carteirinha'
+      preLoaderRoute: typeof AuthenticatedPortalCarteirinhaRouteImport
+      parentRoute: typeof AuthenticatedPortalRoute
+    }
+    '/_authenticated/admin/juridico': {
+      id: '/_authenticated/admin/juridico'
+      path: '/juridico'
+      fullPath: '/admin/juridico'
+      preLoaderRoute: typeof AuthenticatedAdminJuridicoRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/financeiro': {
+      id: '/_authenticated/admin/financeiro'
+      path: '/financeiro'
+      fullPath: '/admin/financeiro'
+      preLoaderRoute: typeof AuthenticatedAdminFinanceiroRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/documentos': {
+      id: '/_authenticated/admin/documentos'
+      path: '/documentos'
+      fullPath: '/admin/documentos'
+      preLoaderRoute: typeof AuthenticatedAdminDocumentosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/configuracoes': {
+      id: '/_authenticated/admin/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/admin/configuracoes'
+      preLoaderRoute: typeof AuthenticatedAdminConfiguracoesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/afiliados': {
+      id: '/_authenticated/admin/afiliados'
+      path: '/afiliados'
+      fullPath: '/admin/afiliados'
+      preLoaderRoute: typeof AuthenticatedAdminAfiliadosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/afiliados/$id': {
+      id: '/_authenticated/admin/afiliados/$id'
+      path: '/$id'
+      fullPath: '/admin/afiliados/$id'
+      preLoaderRoute: typeof AuthenticatedAdminAfiliadosIdRouteImport
+      parentRoute: typeof AuthenticatedAdminAfiliadosRoute
+    }
   }
 }
 
+interface AuthenticatedAdminAfiliadosRouteChildren {
+  AuthenticatedAdminAfiliadosIdRoute: typeof AuthenticatedAdminAfiliadosIdRoute
+}
+
+const AuthenticatedAdminAfiliadosRouteChildren: AuthenticatedAdminAfiliadosRouteChildren =
+  {
+    AuthenticatedAdminAfiliadosIdRoute: AuthenticatedAdminAfiliadosIdRoute,
+  }
+
+const AuthenticatedAdminAfiliadosRouteWithChildren =
+  AuthenticatedAdminAfiliadosRoute._addFileChildren(
+    AuthenticatedAdminAfiliadosRouteChildren,
+  )
+
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAfiliadosRoute: typeof AuthenticatedAdminAfiliadosRouteWithChildren
+  AuthenticatedAdminConfiguracoesRoute: typeof AuthenticatedAdminConfiguracoesRoute
+  AuthenticatedAdminDocumentosRoute: typeof AuthenticatedAdminDocumentosRoute
+  AuthenticatedAdminFinanceiroRoute: typeof AuthenticatedAdminFinanceiroRoute
+  AuthenticatedAdminJuridicoRoute: typeof AuthenticatedAdminJuridicoRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAfiliadosRoute:
+    AuthenticatedAdminAfiliadosRouteWithChildren,
+  AuthenticatedAdminConfiguracoesRoute: AuthenticatedAdminConfiguracoesRoute,
+  AuthenticatedAdminDocumentosRoute: AuthenticatedAdminDocumentosRoute,
+  AuthenticatedAdminFinanceiroRoute: AuthenticatedAdminFinanceiroRoute,
+  AuthenticatedAdminJuridicoRoute: AuthenticatedAdminJuridicoRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
+interface AuthenticatedPortalRouteChildren {
+  AuthenticatedPortalCarteirinhaRoute: typeof AuthenticatedPortalCarteirinhaRoute
+  AuthenticatedPortalFinanceiroRoute: typeof AuthenticatedPortalFinanceiroRoute
+  AuthenticatedPortalJuridicoRoute: typeof AuthenticatedPortalJuridicoRoute
+  AuthenticatedPortalIndexRoute: typeof AuthenticatedPortalIndexRoute
+}
+
+const AuthenticatedPortalRouteChildren: AuthenticatedPortalRouteChildren = {
+  AuthenticatedPortalCarteirinhaRoute: AuthenticatedPortalCarteirinhaRoute,
+  AuthenticatedPortalFinanceiroRoute: AuthenticatedPortalFinanceiroRoute,
+  AuthenticatedPortalJuridicoRoute: AuthenticatedPortalJuridicoRoute,
+  AuthenticatedPortalIndexRoute: AuthenticatedPortalIndexRoute,
+}
+
+const AuthenticatedPortalRouteWithChildren =
+  AuthenticatedPortalRoute._addFileChildren(AuthenticatedPortalRouteChildren)
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+  AuthenticatedAppRoute: typeof AuthenticatedAppRoute
+  AuthenticatedPortalRoute: typeof AuthenticatedPortalRouteWithChildren
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+  AuthenticatedAppRoute: AuthenticatedAppRoute,
+  AuthenticatedPortalRoute: AuthenticatedPortalRouteWithChildren,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  CadastroSlugRoute: CadastroSlugRoute,
+  VerificarIdRoute: VerificarIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
